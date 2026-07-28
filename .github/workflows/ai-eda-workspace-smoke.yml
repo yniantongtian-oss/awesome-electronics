@@ -1,0 +1,64 @@
+name: AI-EDA workspace smoke test
+
+on:
+  pull_request:
+    paths:
+      - "workspace/**"
+      - ".github/workflows/ai-eda-workspace-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-smoke:
+    runs-on: windows-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Parse PowerShell scripts
+        shell: pwsh
+        run: |
+          $failed = $false
+          Get-ChildItem workspace/scripts/*.ps1 | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName,
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+
+            if ($errors.Count -gt 0) {
+              $failed = $true
+              Write-Host "Parser errors in $($_.Name):" -ForegroundColor Red
+              $errors | ForEach-Object { Write-Host $_ }
+            }
+          }
+
+          if ($failed) {
+            exit 1
+          }
+
+      - name: Bootstrap clean Altium-mode workspace
+        shell: pwsh
+        run: |
+          ./workspace/scripts/bootstrap-windows.ps1 `
+            -Root "$env:RUNNER_TEMP\EDA-Workspace" `
+            -Backend altium `
+            -IncludeContextGraph:$true
+
+      - name: Run offline verification
+        shell: pwsh
+        run: |
+          ./workspace/scripts/verify-windows.ps1 `
+            -Root "$env:RUNNER_TEMP\EDA-Workspace" `
+            -Backend altium
