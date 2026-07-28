@@ -1,128 +1,165 @@
-# Personal Electronics & AI-EDA Repository Catalog
+# 个人电子与 AI-EDA 仓库目录
 
-> Maintainer: `yniantongtian-oss`  
-> Last reviewed: 2026-07-28  
-> Purpose: organize recently added electronics, KiCad, PCB automation, component-library, and coding-agent repositories without mixing unrelated upstream codebases.
+> 维护者：`yniantongtian-oss`  
+> 最后审查：2026-07-28  
+> 目标：把近期加入的 EDA、KiCad、PCB 自动化、元件库和编程智能体仓库整理成可使用、可验证、可维护的工作流。
 
-## Recommended working stack
+## 直接使用入口
 
-Use the repositories in the following order when building an AI-assisted EDA workflow:
+完整安装、架构和验收说明位于：
 
-1. **Primary EDA agent:** [`eda-agent`](https://github.com/yniantongtian-oss/eda-agent)
-2. **Compact KiCad-focused alternative:** [`kicad-mcp-1`](https://github.com/yniantongtian-oss/kicad-mcp-1)
-3. **Broad KiCad feature reference:** [`KiCAD-MCP-Server`](https://github.com/yniantongtian-oss/KiCAD-MCP-Server)
-4. **Manufacturing and panelization:** [`KiKit`](https://github.com/yniantongtian-oss/KiKit)
-5. **Symbols, footprints, and 3D assets:** [`hardware-components`](https://github.com/yniantongtian-oss/hardware-components)
-6. **Code-context retrieval for agents:** [`contextgraph`](https://github.com/yniantongtian-oss/contextgraph)
+- [`workspace/README.md`](workspace/README.md)
+- [`workspace/STACK_ARCHITECTURE.md`](workspace/STACK_ARCHITECTURE.md)
+- [`workspace/scripts/bootstrap-windows.ps1`](workspace/scripts/bootstrap-windows.ps1)
+- [`workspace/scripts/verify-windows.ps1`](workspace/scripts/verify-windows.ps1)
 
-## Repository roles
+Windows 默认安装：
 
-| Repository | Role | Recommended status | Notes |
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\workspace\scripts\bootstrap-windows.ps1 -Backend altium
+```
+
+## 已确定的最终工作栈
+
+不再把三个 AI-EDA 仓库都作为“候选主项目”。当前决策为：
+
+1. **唯一主力 EDA 控制层：** [`eda-agent`](https://github.com/yniantongtian-oss/eda-agent)
+2. **代码上下文检索：** [`contextgraph`](https://github.com/yniantongtian-oss/contextgraph)
+3. **PCB 制造与拼板：** [`KiKit`](https://github.com/yniantongtian-oss/KiKit)
+4. **外部元件资产源：** [`hardware-components`](https://github.com/yniantongtian-oss/hardware-components)
+5. **KiCad 对照实现：** [`kicad-mcp-1`](https://github.com/yniantongtian-oss/kicad-mcp-1)
+6. **KiCad 功能参考：** [`KiCAD-MCP-Server`](https://github.com/yniantongtian-oss/KiCAD-MCP-Server)
+
+## 仓库角色
+
+| 仓库 | 角色 | 当前状态 | 维护原则 |
 | --- | --- | --- | --- |
-| [`eda-agent`](https://github.com/yniantongtian-oss/eda-agent) | Main AI-to-EDA control layer | **Primary / active evaluation** | Supports live Altium interaction and an additional KiCad backend. Keep this as the main integration candidate rather than merging every MCP implementation into it. |
-| [`kicad-mcp-1`](https://github.com/yniantongtian-oss/kicad-mcp-1) | Focused KiCad MCP workflow | **Alternative / benchmark** | Smaller tool surface and a strong automated-test emphasis. The `-1` suffix is unclear; a future rename such as `kicad-mcp-blwfish-mirror` would make its origin and purpose easier to understand. |
-| [`KiCAD-MCP-Server`](https://github.com/yniantongtian-oss/KiCAD-MCP-Server) | Large KiCad MCP implementation | **Feature reference / compatibility testbed** | Broad tool coverage. Keep separate from `kicad-mcp-1`; compare capabilities through adapters and tests instead of copying modules between the two projects. |
-| [`KiKit`](https://github.com/yniantongtian-oss/KiKit) | Panelization and manufacturing automation | **Tooling dependency / reference** | Useful after PCB layout is complete: panelization, Gerber export, multi-board workflows, and repeatable fabrication output. |
-| [`hardware-components`](https://github.com/yniantongtian-oss/hardware-components) | KiCad symbols, footprints, metadata, and 3D models | **Read-only asset mirror** | Very large generated asset repository. Avoid editing generated files manually and avoid embedding it directly inside another repository. Prefer sparse or filtered clones when possible. |
-| [`contextgraph`](https://github.com/yniantongtian-oss/contextgraph) | Python code-graph retrieval for LLM agents | **Reusable foundation / active development** | Not an EDA application itself. It can provide focused repository context to coding agents working on the EDA projects. Keep its API generic and independent. |
+| [`eda-agent`](https://github.com/yniantongtian-oss/eda-agent) | AI 到 Altium/KiCad 的主控制层 | **主力** | 默认安装；所有正式 EDA 接入优先从这里完成。 |
+| [`contextgraph`](https://github.com/yniantongtian-oss/contextgraph) | Python 代码图谱和上下文检索 | **主动使用** | 保持通用，不写入 Altium/KiCad 专属业务逻辑。 |
+| [`KiKit`](https://github.com/yniantongtian-oss/KiKit) | 拼板和制造自动化 | **按需安装** | PCB 通过 DRC 后使用，不作为 MCP 主入口。 |
+| [`hardware-components`](https://github.com/yniantongtian-oss/hardware-components) | KiCad 符号、封装、元数据和三维模型 | **外部资源** | 不默认完整克隆；不手动修改流水线生成文件。 |
+| [`kicad-mcp-1`](https://github.com/yniantongtian-oss/kicad-mcp-1) | 精简型 KiCad MCP | **基准/备选** | 不与主力服务同时写同一工程；用于功能和测试对照。 |
+| [`KiCAD-MCP-Server`](https://github.com/yniantongtian-oss/KiCAD-MCP-Server) | 大型 KiCad MCP 实现 | **功能参考** | 用来确认能力覆盖和兼容行为，不进入默认生产安装。 |
 
-## Do not merge these repositories directly
+## 为什么不直接合并三个 AI-EDA 仓库
 
-The three AI-EDA repositories overlap, but they represent different architectures and maintenance models:
+它们虽然功能重叠，但架构、工具命名、依赖、许可证、测试方式和运行模型并不相同。直接复制或合并容易产生：
 
-- `eda-agent` is the best candidate for a unified user-facing control layer.
-- `kicad-mcp-1` is useful as a compact, test-heavy KiCad implementation.
-- `KiCAD-MCP-Server` is useful as a broad feature and protocol reference.
+- MCP 工具重名。
+- 多个服务同时修改同一个工程。
+- KiCad/Altium 运行时依赖冲突。
+- 上游同步困难。
+- 修复无法回馈原始项目。
+- 同一功能出现多个行为不一致的实现。
 
-A safer integration model is:
-
-```text
-AI client
-   |
-   v
-Unified command / evaluation layer
-   |--------------------|----------------------|
-   v                    v                      v
-eda-agent          kicad-mcp-1        KiCAD-MCP-Server
-   |
-   v
-KiCad / Altium projects
-   |
-   +--> KiKit manufacturing pipeline
-   +--> hardware-components asset source
-```
-
-## Maintenance rules
-
-### Upstream-derived repositories
-
-- Preserve the original license, copyright notices, and attribution.
-- Record the upstream repository URL in the README if it is not already obvious.
-- Keep personal modifications on dedicated branches.
-- Pull upstream changes before starting large local changes.
-- Do not present an imported mirror as an independently authored project.
-
-### Generated and large repositories
-
-For `hardware-components`:
-
-- Treat pipeline-generated commits and assets as immutable outputs.
-- Put custom components in a separate small repository or clearly separated custom directory.
-- Prefer `git clone --filter=blob:none` or sparse checkout when the full asset history is unnecessary.
-- Do not commit temporary renders, caches, local KiCad rescue files, or editor backups.
-
-### Naming
-
-Current names mix `KiCAD`, `KiCad`, `kicad`, `main`, and `master`. For future original projects, use:
-
-- Product spelling: **KiCad**
-- Repository slugs: lowercase kebab-case, for example `kicad-agent-tools`
-- Default branch: `main`
-- Mirror suffix: `-mirror`
-- Experimental fork suffix: `-lab`
-
-## Suggested evaluation matrix
-
-Before choosing one KiCad MCP implementation as the long-term base, test each project against the same board and score:
-
-- Installation success on Windows
-- KiCad version compatibility
-- Schematic creation and modification
-- PCB placement and routing
-- DRC/ERC execution
-- Symbol and footprint library handling
-- Gerber, BOM, and manufacturing export
-- Recovery after partial failure
-- Test-suite quality
-- Security boundaries for filesystem and subprocess access
-- Documentation completeness
-
-Store evaluation results in a separate `EDA_TOOL_EVALUATION.md` rather than editing upstream READMEs.
-
-## Next cleanup actions
-
-- [ ] Rename `kicad-mcp-1` to a descriptive mirror or lab name.
-- [ ] Decide whether `eda-agent` is the main integration project.
-- [ ] Add upstream metadata to every imported repository.
-- [ ] Create one small repository for your own custom KiCad symbols and footprints.
-- [ ] Keep `hardware-components` as an external asset source, not a normal development dependency.
-- [ ] Add a shared benchmark board for comparing all EDA agents.
-- [ ] Standardize CI, formatting, and security checks only in repositories you actively modify.
-
-## Classification of the newly reviewed repositories
+正确关系是：
 
 ```text
-AI / EDA control
-├── eda-agent                 [primary candidate]
-├── kicad-mcp-1               [compact alternative]
-└── KiCAD-MCP-Server          [broad reference]
+AI 客户端
+   |
+   v
+eda-agent                       [唯一生产入口]
+   |----------------------|
+   v                      v
+Altium Designer          KiCad 9+
+   |
+   +--> ERC / DRC / BOM / 审查
+   +--> KiKit 制造流程
+   +--> hardware-components 按需取用
 
-Manufacturing automation
-└── KiKit
-
-Component assets
-└── hardware-components
-
-Coding-agent infrastructure
-└── contextgraph
+contextgraph                     [代码维护辅助]
+kicad-mcp-1                      [对照测试]
+KiCAD-MCP-Server                 [功能参考]
 ```
+
+## 默认安装策略
+
+默认安装：
+
+- `eda-agent`
+- `contextgraph`
+
+可选安装：
+
+- `KiKit`
+
+不默认安装：
+
+- `hardware-components`
+- `kicad-mcp-1`
+- `KiCAD-MCP-Server`
+
+机器可读清单位于 [`workspace/repos.json`](workspace/repos.json)。
+
+## 上游仓库维护规则
+
+- 保留原作者、许可证和版权声明。
+- README 中明确上游地址和当前仓库的定位。
+- 个人改动使用单独分支，不把镜像说成独立原创项目。
+- 大改前先同步上游，并记录基准 commit/tag。
+- 不在多个镜像仓库重复维护同一个补丁。
+- 通用修复优先向上游提交 PR；个人产品差异留在自有层。
+
+## 大型和生成型仓库规则
+
+针对 `hardware-components`：
+
+- 把流水线提交和生成资产视为不可手改输出。
+- 自制元件放入独立的小型自有元件库。
+- 只需要部分资产时使用 partial clone、sparse checkout 或按文件下载。
+- 不提交缓存、临时渲染、KiCad 备份、rescue 文件和编辑器临时文件。
+- 不把整个仓库嵌入其他项目或普通 CI。
+
+## 命名规范
+
+以后自建仓库统一使用：
+
+- 产品拼写：**KiCad**
+- 仓库 slug：小写 kebab-case，例如 `kicad-agent-tools`
+- 默认分支：`main`
+- 只读镜像后缀：`-mirror`
+- 实验分支仓库后缀：`-lab`
+
+`kicad-mcp-1` 建议未来重命名为能表示来源和用途的名称，例如：
+
+```text
+kicad-mcp-blwfish-mirror
+```
+
+## 统一评测项目
+
+评测三个 EDA 实现时，应使用同一个测试工程，至少覆盖：
+
+- Windows 安装成功率。
+- KiCad/Altium 版本兼容性。
+- 原理图读取、创建和修改。
+- PCB 元件放置、布线和区域操作。
+- ERC/DRC。
+- 符号、封装和三维模型处理。
+- BOM、Gerber 和装配输出。
+- 中断、超时、部分失败后的恢复。
+- 文件覆盖保护和显式保存。
+- 测试套件、文档和安全边界。
+
+评测结果应写入独立文档，不修改上游项目的原始 README。
+
+## 当前完成情况
+
+- [x] 明确 `eda-agent` 为唯一主力入口。
+- [x] 明确其余仓库的生产、辅助、参考和资源角色。
+- [x] 增加机器可读仓库清单。
+- [x] 增加 Windows 一键安装脚本。
+- [x] 增加离线和在线验收脚本。
+- [x] 增加 Windows GitHub Actions 烟雾测试。
+- [ ] 在本机完成 Altium 在线 `doctor`。
+- [ ] 在本机完成 KiCad API 连接验证。
+- [ ] 建立一个不会影响真实项目的固定测试板。
+- [ ] 完成一次只读审查、一次小范围写入和一次制造输出。
+- [ ] 建立自己的小型 KiCad/Altium 元件库。
+
+## 最终原则
+
+仓库整理的目标不是让账号里“项目更多”，而是形成一条稳定链路：
+
+> 安装可重复、连接可诊断、修改可追踪、错误可恢复、工程可验证、制造资料可导出。
