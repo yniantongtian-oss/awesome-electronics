@@ -34,7 +34,7 @@ function Assert-Command {
 function Invoke-Checked {
     param(
         [Parameter(Mandatory = $true)][string]$Command,
-        [Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments
+        [string[]]$Arguments = @()
     )
 
     & $Command @Arguments
@@ -82,9 +82,9 @@ function Sync-Repository {
     if (Test-Path $GitDirectory) {
         if (-not $SkipUpdate) {
             Write-Step "更新 $Name"
-            Invoke-Checked git -C $Destination fetch origin $Branch --prune
-            Invoke-Checked git -C $Destination checkout $Branch
-            Invoke-Checked git -C $Destination pull --ff-only origin $Branch
+            Invoke-Checked -Command "git" -Arguments @("-C", $Destination, "fetch", "origin", $Branch, "--prune")
+            Invoke-Checked -Command "git" -Arguments @("-C", $Destination, "checkout", $Branch)
+            Invoke-Checked -Command "git" -Arguments @("-C", $Destination, "pull", "--ff-only", "origin", $Branch)
         }
         else {
             Write-Host "跳过更新：$Destination"
@@ -95,7 +95,14 @@ function Sync-Repository {
     }
     else {
         Write-Step "克隆 $Name"
-        Invoke-Checked git clone --filter=blob:none --single-branch --branch $Branch $Url $Destination
+        Invoke-Checked -Command "git" -Arguments @(
+            "clone",
+            "--filter=blob:none",
+            "--single-branch",
+            "--branch", $Branch,
+            $Url,
+            $Destination
+        )
     }
 
     return $Destination
@@ -159,7 +166,7 @@ $EdaAgentExe = Join-Path $VenvDir "Scripts\eda-agent.exe"
 $ContextGraphExe = Join-Path $VenvDir "Scripts\contextgraph.exe"
 
 Write-Step "更新 Python 打包工具"
-Invoke-Checked $VenvPython -m pip install --upgrade pip setuptools wheel
+Invoke-Checked -Command $VenvPython -Arguments @("-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel")
 
 $Extras = if ($Backend -eq "altium") {
     "web,render"
@@ -170,17 +177,17 @@ else {
 
 $EdaInstallSpec = "${EdaAgentPath}[$Extras]"
 Write-Step "安装 eda-agent（$Extras）"
-Invoke-Checked $VenvPython -m pip install -e $EdaInstallSpec
+Invoke-Checked -Command $VenvPython -Arguments @("-m", "pip", "install", "-e", $EdaInstallSpec)
 
 if ($IncludeContextGraph -and $ContextGraphPath) {
     Write-Step "安装 contextgraph"
-    Invoke-Checked $VenvPython -m pip install -e $ContextGraphPath
+    Invoke-Checked -Command $VenvPython -Arguments @("-m", "pip", "install", "-e", $ContextGraphPath)
 }
 
 if ($IncludeKiKit -and $KiKitPath) {
     Write-Step "尝试安装 KiKit"
     try {
-        Invoke-Checked $VenvPython -m pip install -e $KiKitPath
+        Invoke-Checked -Command $VenvPython -Arguments @("-m", "pip", "install", "-e", $KiKitPath)
     }
     catch {
         Write-Warning "KiKit 安装未完成。主 EDA 工作区仍然可用；KiKit 常受本机 KiCad Python 环境影响。错误：$($_.Exception.Message)"
@@ -189,7 +196,7 @@ if ($IncludeKiKit -and $KiKitPath) {
 
 if ($Backend -in @("altium", "both")) {
     Write-Step "安装 Altium DelphiScript"
-    Invoke-Checked $EdaAgentExe install-scripts --force
+    Invoke-Checked -Command $EdaAgentExe -Arguments @("install-scripts", "--force")
 }
 
 Write-Step "运行基础健康检查"
@@ -200,7 +207,22 @@ if ($HealthExitCode -ne 0) {
 }
 
 if ($IncludeContextGraph) {
-    Invoke-Checked $ContextGraphExe --help
+    Invoke-Checked -Command $ContextGraphExe -Arguments @("--help")
+}
+
+$ContextGraphConfig = $null
+if ($ContextGraphPath) {
+    $ContextGraphConfig = [ordered]@{
+        repository = $ContextGraphPath
+        executable = $ContextGraphExe
+    }
+}
+
+$KiKitConfig = $null
+if ($KiKitPath) {
+    $KiKitConfig = [ordered]@{
+        repository = $KiKitPath
+    }
 }
 
 $Config = [ordered]@{
@@ -213,23 +235,8 @@ $Config = [ordered]@{
         repository = $EdaAgentPath
         executable = $EdaAgentExe
     }
-    contextgraph = if ($ContextGraphPath) {
-        [ordered]@{
-            repository = $ContextGraphPath
-            executable = $ContextGraphExe
-        }
-    }
-    else {
-        $null
-    }
-    kikit = if ($KiKitPath) {
-        [ordered]@{
-            repository = $KiKitPath
-        }
-    }
-    else {
-        $null
-    }
+    contextgraph = $ContextGraphConfig
+    kikit = $KiKitConfig
 }
 
 $ConfigPath = Join-Path $Root ".eda-workspace.json"
