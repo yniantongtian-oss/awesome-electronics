@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "workspace_name": "AI-EDA Workspace",
+  "default_backend": "altium",
+  "repositories": [
+    {
+      "name": "eda-agent",
+      "url": "https://github.com/yniantongtian-oss/eda-agent.git",
+      "branch": "main",
+      "role": "primary-eda-control",
+      "default_install": true,
+      "update_policy": "fast-forward-only"
+    },
+    {
+      "name": "contextgraph",
+      "url": "https://github.com/yniantongtian-oss/contextgraph.git",
+      "branch": "main",
+      "role": "code-context-retrieval",
+      "default_install": true,
+      "update_policy": "fast-forward-only"
+    },
+    {
+      "name": "KiKit",
+      "url": "https://github.com/yniantongtian-oss/KiKit.git",
+      "branch": "master",
+      "role": "manufacturing-panelization",
+      "default_install": false,
+      "update_policy": "fast-forward-only"
+    },
+    {
+      "name": "hardware-components",
+      "url": "https://github.com/yniantongtian-oss/hardware-components.git",
+      "branch": "main",
+      "role": "external-component-assets",
+      "default_install": false,
+      "clone_policy": "partial-or-sparse"
+    },
+    {
+      "name": "kicad-mcp-1",
+      "url": "https://github.com/yniantongtian-oss/kicad-mcp-1.git",
+      "branch": "main",
+      "role": "benchmark-alternative",
+      "default_install": false,
+      "production_enabled": false
+    },
+    {
+      "name": "KiCAD-MCP-Server",
+      "url": "https://github.com/yniantongtian-oss/KiCAD-MCP-Server.git",
+      "branch": "main",
+      "role": "feature-reference",
+      "default_install": false,
+      "production_enabled": false
+    }
+  ]
+}
