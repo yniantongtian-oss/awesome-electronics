@@ -29,27 +29,30 @@
     },
     {
       "name": "hardware-components",
-      "url": "https://github.com/yniantongtian-oss/hardware-components.git",
+      "url": "https://github.com/antmicro/hardware-components.git",
       "branch": "main",
       "role": "external-component-assets",
       "default_install": false,
-      "clone_policy": "partial-or-sparse"
+      "clone_policy": "partial-or-sparse",
+      "source_policy": "canonical-upstream-reference"
     },
     {
       "name": "kicad-mcp-1",
-      "url": "https://github.com/yniantongtian-oss/kicad-mcp-1.git",
+      "url": "https://github.com/blwfish/kicad-mcp.git",
       "branch": "main",
       "role": "benchmark-alternative",
       "default_install": false,
-      "production_enabled": false
+      "production_enabled": false,
+      "source_policy": "canonical-upstream-reference"
     },
     {
       "name": "KiCAD-MCP-Server",
-      "url": "https://github.com/yniantongtian-oss/KiCAD-MCP-Server.git",
+      "url": "https://github.com/mixelpixx/KiCAD-MCP-Server.git",
       "branch": "main",
       "role": "feature-reference",
       "default_install": false,
-      "production_enabled": false
+      "production_enabled": false,
+      "source_policy": "canonical-upstream-reference"
     }
   ]
 }
