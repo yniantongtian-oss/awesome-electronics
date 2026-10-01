@@ -29,7 +29,7 @@
     },
     {
       "name": "hardware-components",
-      "url": "antmicro/hardware-components.git",
+      "url": "https://github.com/antmicro/hardware-components.git",
       "branch": "main",
       "role": "external-component-assets",
       "default_install": false,
@@ -38,7 +38,7 @@
     },
     {
       "name": "kicad-mcp-1",
-      "url": "blwfish/kicad-mcp.git",
+      "url": "https://github.com/blwfish/kicad-mcp.git",
       "branch": "main",
       "role": "benchmark-alternative",
       "default_install": false,
@@ -47,7 +47,7 @@
     },
     {
       "name": "KiCAD-MCP-Server",
-      "url": "mixelpixx/KiCAD-MCP-Server.git",
+      "url": "https://github.com/mixelpixx/KiCAD-MCP-Server.git",
       "branch": "main",
       "role": "feature-reference",
       "default_install": false,
