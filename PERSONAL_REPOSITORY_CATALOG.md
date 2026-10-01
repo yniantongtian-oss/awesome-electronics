@@ -1,8 +1,10 @@
 # 个人电子与 AI-EDA 仓库目录
 
 > 维护者：`yniantongtian-oss`  
-> 最后审查：2026-07-28  
+> 最后审查：2026-10-01  
 > 目标：把近期加入的 EDA、KiCad、PCB 自动化、元件库和编程智能体仓库整理成可使用、可验证、可维护的工作流。
+
+纯上游镜像已改为直接引用上游；无独立改动且无附属数据的 Fork 清理，有待核查历史的 Fork 归档保留。EDA 主控制层、个人改动与本地工程继续保留。
 
 ## 直接使用入口
 
@@ -27,9 +29,9 @@ Set-ExecutionPolicy -Scope Process Bypass
 1. **唯一主力 EDA 控制层：** [`eda-agent`](https://github.com/yniantongtian-oss/eda-agent)
 2. **代码上下文检索：** [`contextgraph`](https://github.com/yniantongtian-oss/contextgraph)
 3. **PCB 制造与拼板：** [`KiKit`](https://github.com/yniantongtian-oss/KiKit)
-4. **外部元件资产源：** [`hardware-components`](https://github.com/yniantongtian-oss/hardware-components)
-5. **KiCad 对照实现：** [`kicad-mcp-1`](https://github.com/yniantongtian-oss/kicad-mcp-1)
-6. **KiCad 功能参考：** [`KiCAD-MCP-Server`](https://github.com/yniantongtian-oss/KiCAD-MCP-Server)
+4. **外部元件资产源：** [`hardware-components`](antmicro/hardware-components)
+5. **KiCad 对照实现：** [`kicad-mcp-1`](blwfish/kicad-mcp)
+6. **KiCad 功能参考：** [`KiCAD-MCP-Server`](mixelpixx/KiCAD-MCP-Server)
 
 ## 仓库角色
 
@@ -38,9 +40,9 @@ Set-ExecutionPolicy -Scope Process Bypass
 | [`eda-agent`](https://github.com/yniantongtian-oss/eda-agent) | AI 到 Altium/KiCad 的主控制层 | **主力** | 默认安装；所有正式 EDA 接入优先从这里完成。 |
 | [`contextgraph`](https://github.com/yniantongtian-oss/contextgraph) | Python 代码图谱和上下文检索 | **主动使用** | 保持通用，不写入 Altium/KiCad 专属业务逻辑。 |
 | [`KiKit`](https://github.com/yniantongtian-oss/KiKit) | 拼板和制造自动化 | **按需安装** | PCB 通过 DRC 后使用，不作为 MCP 主入口。 |
-| [`hardware-components`](https://github.com/yniantongtian-oss/hardware-components) | KiCad 符号、封装、元数据和三维模型 | **外部资源** | 不默认完整克隆；不手动修改流水线生成文件。 |
-| [`kicad-mcp-1`](https://github.com/yniantongtian-oss/kicad-mcp-1) | 精简型 KiCad MCP | **基准/备选** | 不与主力服务同时写同一工程；用于功能和测试对照。 |
-| [`KiCAD-MCP-Server`](https://github.com/yniantongtian-oss/KiCAD-MCP-Server) | 大型 KiCad MCP 实现 | **功能参考** | 用来确认能力覆盖和兼容行为，不进入默认生产安装。 |
+| [`hardware-components`](antmicro/hardware-components) | KiCad 符号、封装、元数据和三维模型 | **外部资源** | 不默认完整克隆；不手动修改流水线生成文件。 |
+| [`kicad-mcp-1`](blwfish/kicad-mcp) | 精简型 KiCad MCP | **基准/备选** | 不与主力服务同时写同一工程；用于功能和测试对照。 |
+| [`KiCAD-MCP-Server`](mixelpixx/KiCAD-MCP-Server) | 大型 KiCad MCP 实现 | **功能参考** | 用来确认能力覆盖和兼容行为，不进入默认生产安装。 |
 
 ## 为什么不直接合并三个 AI-EDA 仓库
 
